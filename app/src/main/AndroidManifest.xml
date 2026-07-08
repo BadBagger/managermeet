@@ -8,6 +8,10 @@
         android:roundIcon="@drawable/ic_launcher"
         android:supportsRtl="true"
         android:theme="@style/Theme.ManagerMeet">
+        <provider
+            android:name=".ManagerMeetSummaryProvider"
+            android:authorities="com.smithware.managermeet.summary"
+            android:exported="true" />
         <activity
             android:name=".MainActivity"
             android:exported="true"

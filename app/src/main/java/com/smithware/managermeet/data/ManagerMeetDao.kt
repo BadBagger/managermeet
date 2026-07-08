@@ -19,6 +19,15 @@ interface ManagerMeetDao {
     @Query("SELECT COUNT(*) FROM projects")
     suspend fun projectCount(): Int
 
+    @Query("SELECT COUNT(*) FROM projects WHERE archived = 0")
+    suspend fun activeProjectCount(): Int
+
+    @Query("SELECT AVG(progress) FROM projects WHERE archived = 0")
+    suspend fun averageProgress(): Double?
+
+    @Query("SELECT name FROM projects WHERE archived = 0 ORDER BY lastEdited DESC LIMIT 3")
+    suspend fun latestProjectNames(): List<String>
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertProject(project: ProjectEntity)
 

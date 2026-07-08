@@ -1,7 +1,37 @@
+import java.util.Properties
+
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.plugin.compose")
     id("com.google.devtools.ksp")
+}
+
+val keystorePropertiesFile = rootProject.file("keystore.properties")
+val keystoreProperties = Properties()
+if (keystorePropertiesFile.exists()) {
+    keystorePropertiesFile.inputStream().use { keystoreProperties.load(it) }
+}
+
+fun signingProperty(name: String): String? =
+    keystoreProperties.getProperty(name)?.trim()?.takeIf { it.isNotEmpty() }
+
+val releaseStoreFile = signingProperty("storeFile")?.let { rootProject.file(it) }
+val releaseSigningReady =
+    releaseStoreFile?.exists() == true &&
+        signingProperty("storePassword") != null &&
+        signingProperty("keyAlias") != null &&
+        signingProperty("keyPassword") != null
+
+gradle.taskGraph.whenReady {
+    val releaseTaskRequested = allTasks.any { task ->
+        task.name.contains("Release", ignoreCase = true) ||
+            task.path.contains("Release", ignoreCase = true)
+    }
+    if (releaseTaskRequested && !releaseSigningReady) {
+        throw GradleException(
+            "Release signing requires local keystore.properties with storeFile, storePassword, keyAlias, and keyPassword. Debug signing is not allowed for release builds."
+        )
+    }
 }
 
 android {
@@ -12,18 +42,27 @@ android {
         applicationId = "com.smithware.managermeet"
         minSdk = 26
         targetSdk = 36
-        versionCode = 1
-        versionName = "0.1.0-mvp"
+        versionCode = 2
+        versionName = "0.1.1-release-signed"
     }
 
     signingConfigs {
-        getByName("debug")
+        create("release") {
+            if (releaseSigningReady) {
+                storeFile = releaseStoreFile
+                storePassword = signingProperty("storePassword")
+                keyAlias = signingProperty("keyAlias")
+                keyPassword = signingProperty("keyPassword")
+            }
+        }
     }
 
     buildTypes {
         release {
             isMinifyEnabled = false
-            signingConfig = signingConfigs.getByName("debug")
+            if (releaseSigningReady) {
+                signingConfig = signingConfigs.getByName("release")
+            }
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"

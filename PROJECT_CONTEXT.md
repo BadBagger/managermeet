@@ -6,7 +6,10 @@
 - Studio: Smithware Studios
 - Package: `com.smithware.managermeet`
 - Repo: `https://github.com/BadBagger/managermeet`
-- Current release target: `v0.1.0-mvp`
+- Current release target: `v0.1.1-release-signed`
+- Previous release: `v0.1.0-mvp`
+- Release signing: local-only `keystore.properties`; release builds use the Smithware outside-Play release key for `com.smithware.managermeet`.
+- Release SHA-256: `8c424a64a3d13ff021d0a871f3c41573656095a25632acda96104f03bea24000`
 
 ## v0.1.0-mvp
 
@@ -19,8 +22,12 @@ Codex-ready prompt generation.
 Privacy stance: no login, no cloud, no paid APIs, and no uploads in v1.
 Your app ideas stay on this device.
 
+Smithware Central integration: `ManagerMeetSummaryProvider` exposes a read-only
+summary at `content://com.smithware.managermeet.summary/summary` with project
+counts, average progress, active plan names, and no raw notes or prompts.
+
 ## DevHub
 
 DevHub should list ManagerMeet with package `com.smithware.managermeet`, repo
-`BadBagger/managermeet`, pinned release `v0.1.0-mvp`, and asset
+`BadBagger/managermeet`, pinned release `v0.1.1-release-signed`, and asset
 `ManagerMeet.apk`.
